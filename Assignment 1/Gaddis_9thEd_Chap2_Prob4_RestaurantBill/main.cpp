@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     float totlBill = mlCost + taxAmnt + tip; // Calculating the total of the bill 
     
 //Display the info  
-    cout << "Meal Cost: " << mealCost << endl; 
+    cout << "Meal Cost: " << mlCost << endl; 
     cout << "Tax Amount: " << taxAmnt << endl; 
     cout << "Total Bill: " << totlBill << endl;    
     return 0;

@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     
  // Logic for calculation for sale
     float subTotl = item1 + item2 + item3 + item4 + item5; // Calculating subtotal of meal 
-    float grandTotal = subTotl + (subTotl * saleTax / 100); // Calculating grand total of meal 
+    float grndTotl = subTotl + (subTotl * saleTax / 100); // Calculating grand total of meal 
 
  // Displaying item information 
     cout << "Itemized List Below" << endl; 
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     cout << "==================" << endl; 
     cout << "Subtotal: " << subTotl << endl; 
     cout << "Tax: " << saleTax << "%" << endl; 
-    cout << "Grand Total: " << grandTotal << endl; 
+    cout << "Grand Total: " << grndTotl << endl; 
     return 0;
 }
 
