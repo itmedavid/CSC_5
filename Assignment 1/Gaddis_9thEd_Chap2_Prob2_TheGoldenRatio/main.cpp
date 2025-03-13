@@ -7,7 +7,7 @@
  * File:   main.cpp
  * Author: David
  *
- * Created on February 18, 2025, 6:36 PM
+ * Created on February 18, 2025, 7:22 PM
  */
 
 #include <cstdlib>
@@ -15,24 +15,20 @@
 
 using namespace std;
 
+/*
+ *
+ */
 int main(int argc, char **argv)
 {
 
-  // Init variables
-  int a;
-  int b;
-  int c;
+    // initializing & defining Variables
+    int recHght = 5;     // Rectangle height value
+    float gRatio = 1.62; // Golden ratio
 
-  // Define Variables
-  a = 10;
-  b = 20;
-  c = 30;
+    // Calculation for width
+    float recWth = recHght * gRatio;
 
-  // product calculation
-  int product = a * b * c;
-
-  // Display product
-  cout << product << endl;
-
-  return 0;
+    // Output
+    cout << "Your rectangle width is: " << recWth << "cm" << endl;
+    return 0;
 }
