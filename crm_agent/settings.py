@@ -1,0 +1,62 @@
+"""Configuration loaded from environment variables with sane defaults.
+
+Single source of truth for runtime configuration. The Streamlit sidebar may
+override a small subset of these for the current session only; persistent
+changes belong in `.env`.
+"""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+PACKAGE_ROOT = Path(__file__).resolve().parent
+load_dotenv(PACKAGE_ROOT / ".env")
+
+
+def _bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    return int(raw) if raw else default
+
+
+def _float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    return float(raw) if raw else default
+
+
+LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "anthropic").strip().lower()
+
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
+
+DEFAULT_INITIALS = os.environ.get("DEFAULT_INITIALS", "DB")
+AUTO_MATCH_THRESHOLD = _int("AUTO_MATCH_THRESHOLD", 90)
+REVIEW_THRESHOLD = _int("REVIEW_THRESHOLD", 70)
+
+DB_PATH = PACKAGE_ROOT / os.environ.get("DB_PATH", "data/store_database.db")
+EXPORTS_DIR = PACKAGE_ROOT / os.environ.get("EXPORTS_DIR", "exports")
+LOGS_DIR = PACKAGE_ROOT / os.environ.get("LOGS_DIR", "logs")
+
+TIMEZONE = os.environ.get("TIMEZONE", "America/Los_Angeles")
+
+LLM_TEMPERATURE = _float("LLM_TEMPERATURE", 0.2)
+LLM_MAX_TOKENS = _int("LLM_MAX_TOKENS", 800)
+ENABLE_PROMPT_CACHE = _bool("ENABLE_PROMPT_CACHE", True)
+
+APP_VERSION = "0.1.0"
+
+SCHEMA_PATH = PACKAGE_ROOT / "data" / "schema.sql"
+SEED_STORES_CSV = PACKAGE_ROOT / "data" / "seed_stores.csv"
+SEED_CONTACTS_CSV = PACKAGE_ROOT / "data" / "seed_contacts.csv"

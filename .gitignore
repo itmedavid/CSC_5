@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# CRM agent runtime artifacts
+crm_agent/data/store_database.db
+crm_agent/exports/
+crm_agent/logs/
+!crm_agent/exports/.gitkeep
+!crm_agent/logs/.gitkeep
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
