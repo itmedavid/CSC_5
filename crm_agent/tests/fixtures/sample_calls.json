@@ -1,0 +1,46 @@
+[
+  {
+    "id": "rc_001",
+    "direction": "Inbound",
+    "start_time": "2026-05-02T21:30:00Z",
+    "duration_seconds": 245,
+    "result": "Accepted",
+    "from": {"phone": "+14155551212", "name": "Anita Patel"},
+    "to":   {"phone": "+19998887777", "name": "DB"},
+    "transcript_text": "Anita confirmed the hardware delivery slipped to next week. She is fine with the revised timing. Asked us to send an updated install schedule by Friday.",
+    "recording_url": null
+  },
+  {
+    "id": "rc_002",
+    "direction": "Inbound",
+    "start_time": "2026-05-02T22:05:00Z",
+    "duration_seconds": 180,
+    "result": "Accepted",
+    "from": {"phone": "+12125559876", "name": "Marcus Lee"},
+    "to":   {"phone": "+19998887777", "name": "DB"},
+    "transcript_text": "Marcus asking about training timeline. Told him two weeks out. Mentioned that POS hardware shipment is still delayed which is the current blocker.",
+    "recording_url": null
+  },
+  {
+    "id": "rc_003",
+    "direction": "Outbound",
+    "start_time": "2026-05-02T23:15:00Z",
+    "duration_seconds": 410,
+    "result": "Accepted",
+    "from": {"phone": "+19998887777", "name": "DB"},
+    "to":   {"phone": "+13105557701", "name": "Sarah Reilly"},
+    "transcript_text": "Walked through the install plan with Sarah. Tom is offsite this week and his signoff on payment terms is still pending; that is the outstanding risk.",
+    "recording_url": null
+  },
+  {
+    "id": "rc_004",
+    "direction": "Inbound",
+    "start_time": "2026-05-02T17:45:00Z",
+    "duration_seconds": 0,
+    "result": "Missed",
+    "from": {"phone": "+15550102030", "name": null},
+    "to":   {"phone": "+19998887777", "name": "DB"},
+    "transcript_text": null,
+    "recording_url": null
+  }
+]

@@ -2,13 +2,72 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import streamlit as st
 
+import settings
 from db import stores_repo
 from db.connection import get_conn
+from integrations.ringcentral import call_to_raw_text, get_client
 from matcher import store_matcher
 from parser.note_splitter import split_notes
 from ui.state import band_color, confidence_band, reset_pipeline
+
+
+def _render_ringcentral_pull() -> None:
+    """Sub-section: pull today's calls and append to the bulk paste."""
+    with st.expander(
+        f"Pull from RingCentral (mode: **{settings.RINGCENTRAL_MODE}**)",
+        expanded=False,
+    ):
+        if settings.RINGCENTRAL_MODE == "mock":
+            st.caption(
+                f"Reading fixture: `{settings.RINGCENTRAL_FIXTURE_PATH.name}`. "
+                "Switch RINGCENTRAL_MODE to `live` in `.env` once the live client is wired."
+            )
+        else:
+            st.caption(
+                "Live mode is a skeleton — see `integrations/ringcentral.py` "
+                "→ `LiveRingCentralClient` for the auth steps to fill in."
+            )
+
+        # Default to the fixture's date so the demo works without editing anything.
+        default_pull_date = (
+            date(2026, 5, 2) if settings.RINGCENTRAL_MODE == "mock" else date.today()
+        )
+        pull_date = st.date_input(
+            "Date to pull",
+            value=default_pull_date,
+            key="rc_pull_date",
+        )
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            pull_clicked = st.button("Pull calls", key="rc_pull_btn")
+        if pull_clicked:
+            try:
+                client = get_client(
+                    settings.RINGCENTRAL_MODE,
+                    fixture_path=settings.RINGCENTRAL_FIXTURE_PATH,
+                )
+                calls = client.list_calls(on_date=pull_date)
+            except Exception as e:
+                st.error(f"RingCentral pull failed: {e}")
+                return
+            if not calls:
+                st.warning(f"No calls found for {pull_date.isoformat()}.")
+                return
+            chunks = [call_to_raw_text(c) for c in calls]
+            new_text = "\n\n".join(chunks)
+            existing = st.session_state.bulk_paste.strip()
+            st.session_state.bulk_paste = (
+                f"{existing}\n\n{new_text}" if existing else new_text
+            )
+            st.success(
+                f"Appended {len(calls)} call(s) to the paste below. "
+                "Click Parse to run the pipeline."
+            )
+            st.rerun()
 
 
 def render() -> None:
@@ -17,6 +76,8 @@ def render() -> None:
         "Paste your day's raw notes. The parser splits on date headers (your "
         "convention) and the matcher identifies the store for each chunk."
     )
+
+    _render_ringcentral_pull()
 
     bulk = st.text_area(
         "Bulk paste",

@@ -60,3 +60,16 @@ APP_VERSION = "0.1.0"
 SCHEMA_PATH = PACKAGE_ROOT / "data" / "schema.sql"
 SEED_STORES_CSV = PACKAGE_ROOT / "data" / "seed_stores.csv"
 SEED_CONTACTS_CSV = PACKAGE_ROOT / "data" / "seed_contacts.csv"
+
+# RingCentral integration (M2). "mock" reads the fixture; "live" requires
+# OAuth/JWT credentials and the official `ringcentral` SDK.
+RINGCENTRAL_MODE = os.environ.get("RINGCENTRAL_MODE", "mock").strip().lower()
+RINGCENTRAL_FIXTURE_PATH = PACKAGE_ROOT / os.environ.get(
+    "RINGCENTRAL_FIXTURE_PATH", "tests/fixtures/sample_calls.json"
+)
+RINGCENTRAL_CLIENT_ID = os.environ.get("RINGCENTRAL_CLIENT_ID", "")
+RINGCENTRAL_CLIENT_SECRET = os.environ.get("RINGCENTRAL_CLIENT_SECRET", "")
+RINGCENTRAL_SERVER_URL = os.environ.get(
+    "RINGCENTRAL_SERVER_URL", "https://platform.ringcentral.com"
+)
+RINGCENTRAL_JWT = os.environ.get("RINGCENTRAL_JWT", "")

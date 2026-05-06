@@ -96,9 +96,11 @@ crm_agent/
   formatter/                # SYSTEM_PROMPT + build_user_prompt + orchestrator
   ui/                       # Streamlit pages (parse / review / export / stores)
   exporters/                # text file writer + JSONL action log
+  integrations/             # M2+ external systems
+    ringcentral.py          # M2: call-log pull (mock + live skeleton)
   exports/                  # gitignored: approved_notes_<ts>.txt
   logs/                     # gitignored: action_log.jsonl
-  tests/                    # 26 unit tests (pytest)
+  tests/                    # 37 unit + integration tests (pytest)
 ```
 
 ## Hard rules (also enforced in code)
@@ -124,13 +126,31 @@ served from cache. Note: the system prompt is currently small (~500 tokens),
 which is below the Sonnet 4.6 cache minimum (~2K tokens). The infrastructure
 is in place for when the prompt grows.
 
+## RingCentral integration (M2)
+
+Pulls today's calls and converts each into a date-headered raw note that
+flows through the same parse / match / format pipeline. The fixture-backed
+mock client works offline; the live client is a documented skeleton.
+
+To switch on the live client:
+
+1. `pip install ringcentral` (the official Python SDK).
+2. Set `RINGCENTRAL_MODE=live` and the four `RINGCENTRAL_*` vars in `.env`.
+3. Implement `_authenticate()` and `list_calls()` in
+   `integrations/ringcentral.py` per the docstring (JWT auth recommended).
+
+In the UI: the **Parse** page has a "Pull from RingCentral" expander that
+fetches calls for a chosen date and appends them to the bulk paste. Click
+Parse to run the rest of the pipeline.
+
 ## Tests
 
 ```bash
 pytest tests/ -v
 ```
 
-26 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
+37 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
 (date headers, `---`, blank lines), the matcher's confidence bands and the
-ambiguity guard, and the formatter pipeline + post-hoc validator (using the
-mock provider, no API key required).
+ambiguity guard, the formatter pipeline + post-hoc validator (using the mock
+provider, no API key required), and the RingCentral conversion + mock client
++ end-to-end pipeline integration.
