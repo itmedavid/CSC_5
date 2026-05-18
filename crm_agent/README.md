@@ -99,13 +99,14 @@ crm_agent/
   integrations/             # external systems
     ringcentral.py          # M2: call-log pull (mock + live skeleton)
     outlook.py              # M3: Zoom-recap email pull (mock + live skeleton)
+    guidecx_browser.py      # M4: paste to GuideCX (dry-run + Playwright skel)
   formatter/
     note_formatter.py       # builds prompt -> provider -> validate
     prompts.py              # SYSTEM_PROMPT for note formatting
     recap_summarizer.py     # M3: condense long transcripts before formatting
   exports/                  # gitignored: approved_notes_<ts>.txt
   logs/                     # gitignored: action_log.jsonl
-  tests/                    # 51 unit + integration tests (pytest)
+  tests/                    # 65 unit + integration tests (pytest)
 ```
 
 ## Hard rules (also enforced in code)
@@ -171,16 +172,49 @@ In the UI: the **Parse** page has a "Pull from Outlook" expander parallel to
 the RingCentral one, with a checkbox to toggle whether long transcripts get
 summarized via the LLM.
 
+## GuideCX paste (M4)
+
+The **Paste** page lets you send approved notes to GuideCX one at a time.
+Defaults to dry-run mode (no browser, no network — only logs what would have
+happened). Live mode is a Playwright skeleton with configurable selectors.
+
+Hard rules enforced on this page:
+
+- **No batch paste button.** Every paste is a per-note explicit click.
+- **Preview before paste.** The full note text and destination URL are shown
+  on the card BEFORE the button does anything.
+- **Every attempt logs a row** to `logs/action_log.jsonl` with
+  `decision: "pasted"` (live success) or `"dry_run_pasted"` (dry-run, or any
+  failure). Grep the log to see what actually went where.
+- **Save is not auto-clicked.** Even in live mode, the Playwright client
+  fills the textarea but does not press Save. You verify the paste in the
+  real GuideCX UI and click Save yourself — the final approval gate.
+- **Always a manual fallback.** "Open in browser (manual)" link is shown
+  alongside the paste button so you can copy-paste yourself if the
+  automation misbehaves.
+
+To activate live mode:
+
+1. `pip install playwright && playwright install chromium`.
+2. Set `GUIDECX_MODE=live` in `.env`.
+3. Set `GUIDECX_USER_DATA_DIR` to a persistent path. On first launch you log
+   into GuideCX manually; subsequent runs reuse the cookies.
+4. Open GuideCX, inspect the notes-tab / textarea / save-button elements, and
+   fill in the three `GUIDECX_*_SELECTOR` vars.
+5. Replace the `raise NotImplementedError` in `PlaywrightClient.paste()` with
+   the body sketched in its docstring.
+
 ## Tests
 
 ```bash
 pytest tests/ -v
 ```
 
-51 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
+65 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
 (date headers, `---`, blank lines), the matcher's confidence bands and the
 ambiguity guard, the formatter pipeline + post-hoc validator (using the mock
 provider, no API key required), the RingCentral conversion + mock client +
 end-to-end pipeline integration, the recap summarizer's threshold + provider
-interaction, and the Outlook conversion + mock client + end-to-end pipeline
-integration with summarization.
+interaction, the Outlook conversion + mock client + end-to-end pipeline
+integration with summarization, and the GuideCX dry-run client + URL builder
++ log-row shape + factory + live-skeleton contract.

@@ -88,3 +88,17 @@ OUTLOOK_CLIENT_SECRET = os.environ.get("OUTLOOK_CLIENT_SECRET", "")
 # through the summarizer LLM before reaching the note formatter.
 RECAP_SUMMARIZE_CHAR_THRESHOLD = _int("RECAP_SUMMARIZE_CHAR_THRESHOLD", 1500)
 RECAP_MAX_TOKENS = _int("RECAP_MAX_TOKENS", 600)
+
+# GuideCX browser-paste integration (M4). Default mode is "dry_run" — no
+# browser is launched, paste actions only log what would have happened.
+# Set GUIDECX_MODE=live to opt into the real Playwright-driven paste.
+GUIDECX_MODE = os.environ.get("GUIDECX_MODE", "dry_run").strip().lower()
+GUIDECX_PROJECT_URL_TEMPLATE = os.environ.get(
+    "GUIDECX_PROJECT_URL_TEMPLATE",
+    "https://app.guidecx.com/projects/{project_id}",
+)
+GUIDECX_USER_DATA_DIR = os.environ.get("GUIDECX_USER_DATA_DIR", "")
+GUIDECX_HEADLESS = _bool("GUIDECX_HEADLESS", False)
+GUIDECX_NOTES_TAB_SELECTOR = os.environ.get("GUIDECX_NOTES_TAB_SELECTOR", "")
+GUIDECX_NOTE_TEXTAREA_SELECTOR = os.environ.get("GUIDECX_NOTE_TEXTAREA_SELECTOR", "")
+GUIDECX_SAVE_BUTTON_SELECTOR = os.environ.get("GUIDECX_SAVE_BUTTON_SELECTOR", "")

@@ -13,9 +13,13 @@ approval, never invent details, log every action.
   pull Zoom recap emails and condense long transcripts before they hit the
   note formatter. Mock client + fixture for offline dev; live client is a
   documented Microsoft Graph skeleton.
+- ✅ **M4: `integrations/guidecx_browser.py`** — per-note "Send to GuideCX"
+  paste with dry-run as the default mode. Live mode is a Playwright skeleton
+  with configurable selectors (DOM changes => `.env` patch, not code).
+  Per-note explicit click, no batch surface, every attempt logs to JSONL.
 
-## Planned (not yet stubbed — empty modules invite accidental imports)
+## Planned
 
-- `integrations/guidecx_browser.py` — Playwright-driven helper that opens the
-  matched project in GuideCX and pastes the approved note. Still gated behind a
-  manual click; never autonomous.
+No further milestones planned for MVP. Future work would be quality-of-life:
+audit-log viewer page, multi-rep initials per note, bulk regenerate, and
+hardening of the live integrations as they get wired up.

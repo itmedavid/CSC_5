@@ -19,7 +19,13 @@ import streamlit as st  # noqa: E402
 
 import settings  # noqa: E402
 from db.connection import init_db  # noqa: E402
-from ui import pages_export, pages_parse, pages_review, pages_stores  # noqa: E402
+from ui import (  # noqa: E402
+    pages_export,
+    pages_parse,
+    pages_paste,
+    pages_review,
+    pages_stores,
+)
 from ui.state import init_state  # noqa: E402
 
 st.set_page_config(page_title="CRM Onboarding Assistant", layout="wide")
@@ -33,7 +39,7 @@ with st.sidebar:
 
     page = st.radio(
         "Page",
-        ["Parse", "Review", "Export", "Stores"],
+        ["Parse", "Review", "Export", "Paste", "Stores"],
         label_visibility="collapsed",
     )
 
@@ -74,5 +80,7 @@ elif page == "Review":
     pages_review.render()
 elif page == "Export":
     pages_export.render()
+elif page == "Paste":
+    pages_paste.render()
 elif page == "Stores":
     pages_stores.render()
