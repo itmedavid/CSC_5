@@ -9,10 +9,21 @@ import streamlit as st
 import settings
 from db import stores_repo
 from db.connection import get_conn
+from integrations.outlook import email_to_raw_text
+from integrations.outlook import get_client as get_outlook_client
 from integrations.ringcentral import call_to_raw_text, get_client
+from llm.factory import get_provider
 from matcher import store_matcher
 from parser.note_splitter import split_notes
 from ui.state import band_color, confidence_band, reset_pipeline
+
+
+def _resolve_provider():
+    """Return the LLMProvider for summarization, or None on failure."""
+    try:
+        return get_provider(st.session_state.provider_override or None)
+    except Exception:
+        return None
 
 
 def _render_ringcentral_pull() -> None:
@@ -70,6 +81,81 @@ def _render_ringcentral_pull() -> None:
             st.rerun()
 
 
+def _render_outlook_pull() -> None:
+    """Sub-section: pull today's Zoom-recap emails and append to the bulk paste."""
+    with st.expander(
+        f"Pull from Outlook (Zoom recap emails, mode: **{settings.OUTLOOK_MODE}**)",
+        expanded=False,
+    ):
+        if settings.OUTLOOK_MODE == "mock":
+            st.caption(
+                f"Reading fixture: `{settings.OUTLOOK_FIXTURE_PATH.name}`. "
+                "Long transcripts are condensed via the recap summarizer before "
+                "they reach the bulk paste."
+            )
+        else:
+            st.caption(
+                "Live mode is a skeleton — see `integrations/outlook.py` "
+                "→ `LiveOutlookClient` for the Microsoft Graph wiring."
+            )
+
+        default_pull_date = (
+            date(2026, 5, 2) if settings.OUTLOOK_MODE == "mock" else date.today()
+        )
+        pull_date = st.date_input(
+            "Date to pull",
+            value=default_pull_date,
+            key="outlook_pull_date",
+        )
+        summarize_long = st.checkbox(
+            "Summarize long transcripts via LLM",
+            value=True,
+            key="outlook_summarize",
+            help=(
+                "Transcripts longer than "
+                f"{settings.RECAP_SUMMARIZE_CHAR_THRESHOLD} chars are condensed "
+                "first. Uncheck to keep transcripts verbatim (no LLM call)."
+            ),
+        )
+        if st.button("Pull recaps", key="outlook_pull_btn"):
+            try:
+                client = get_outlook_client(
+                    settings.OUTLOOK_MODE,
+                    fixture_path=settings.OUTLOOK_FIXTURE_PATH,
+                )
+                emails = client.list_recap_emails(on_date=pull_date)
+            except Exception as e:
+                st.error(f"Outlook pull failed: {e}")
+                return
+            if not emails:
+                st.warning(f"No recap emails found for {pull_date.isoformat()}.")
+                return
+            provider = _resolve_provider() if summarize_long else None
+            with st.spinner("Rendering recaps..."):
+                chunks = [
+                    email_to_raw_text(
+                        e,
+                        provider=provider,
+                        char_threshold=settings.RECAP_SUMMARIZE_CHAR_THRESHOLD,
+                    )
+                    for e in emails
+                ]
+            new_text = "\n\n".join(chunks)
+            existing = st.session_state.bulk_paste.strip()
+            st.session_state.bulk_paste = (
+                f"{existing}\n\n{new_text}" if existing else new_text
+            )
+            summarized_count = sum(
+                1 for e in emails
+                if len(e.transcript_text or "") > settings.RECAP_SUMMARIZE_CHAR_THRESHOLD
+            )
+            st.success(
+                f"Appended {len(emails)} recap(s) to the paste below "
+                f"({summarized_count} summarized). Click Parse to run the pipeline."
+            )
+            st.rerun()
+
+
 def render() -> None:
     st.header("Parse")
     st.caption(
@@ -78,6 +164,7 @@ def render() -> None:
     )
 
     _render_ringcentral_pull()
+    _render_outlook_pull()
 
     bulk = st.text_area(
         "Bulk paste",

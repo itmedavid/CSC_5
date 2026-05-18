@@ -96,11 +96,16 @@ crm_agent/
   formatter/                # SYSTEM_PROMPT + build_user_prompt + orchestrator
   ui/                       # Streamlit pages (parse / review / export / stores)
   exporters/                # text file writer + JSONL action log
-  integrations/             # M2+ external systems
+  integrations/             # external systems
     ringcentral.py          # M2: call-log pull (mock + live skeleton)
+    outlook.py              # M3: Zoom-recap email pull (mock + live skeleton)
+  formatter/
+    note_formatter.py       # builds prompt -> provider -> validate
+    prompts.py              # SYSTEM_PROMPT for note formatting
+    recap_summarizer.py     # M3: condense long transcripts before formatting
   exports/                  # gitignored: approved_notes_<ts>.txt
   logs/                     # gitignored: action_log.jsonl
-  tests/                    # 37 unit + integration tests (pytest)
+  tests/                    # 51 unit + integration tests (pytest)
 ```
 
 ## Hard rules (also enforced in code)
@@ -143,14 +148,39 @@ In the UI: the **Parse** page has a "Pull from RingCentral" expander that
 fetches calls for a chosen date and appends them to the bulk paste. Click
 Parse to run the rest of the pipeline.
 
+## Outlook + recap summarizer (M3)
+
+Pulls Zoom recap emails the same way M2 pulls calls. Long transcripts are
+routed through `formatter/recap_summarizer.py` — a separate LLM call with its
+own condensation-focused system prompt — before reaching the note formatter.
+This keeps per-note token budgets small and prompt-cache hit rates high.
+
+The threshold (`RECAP_SUMMARIZE_CHAR_THRESHOLD`, default 1500 chars ≈ 400
+tokens) is configurable in `.env`. Below the threshold, transcripts pass
+through untouched without an LLM call.
+
+To switch on the live Outlook client:
+
+1. Register an app in Azure AD with `Mail.Read` (or `Mail.Read.Shared`).
+2. `pip install msal` and either `msgraph-sdk` or use `httpx` directly.
+3. Set `OUTLOOK_MODE=live` and the three `OUTLOOK_*` vars in `.env`.
+4. Implement `_authenticate()` and `list_recap_emails()` in
+   `integrations/outlook.py` per the docstring.
+
+In the UI: the **Parse** page has a "Pull from Outlook" expander parallel to
+the RingCentral one, with a checkbox to toggle whether long transcripts get
+summarized via the LLM.
+
 ## Tests
 
 ```bash
 pytest tests/ -v
 ```
 
-37 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
+51 tests cover: the SQLite schema and CSV seeder, the note splitter heuristics
 (date headers, `---`, blank lines), the matcher's confidence bands and the
 ambiguity guard, the formatter pipeline + post-hoc validator (using the mock
-provider, no API key required), and the RingCentral conversion + mock client
-+ end-to-end pipeline integration.
+provider, no API key required), the RingCentral conversion + mock client +
+end-to-end pipeline integration, the recap summarizer's threshold + provider
+interaction, and the Outlook conversion + mock client + end-to-end pipeline
+integration with summarization.

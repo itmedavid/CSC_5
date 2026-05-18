@@ -1,0 +1,26 @@
+[
+  {
+    "id": "msg_001",
+    "subject": "Zoom meeting recap: Pioneer Coffee onboarding sync",
+    "received_at": "2026-05-02T16:00:00Z",
+    "sender": {"email": "noreply@zoom.us", "name": "Zoom Recordings"},
+    "meeting_topic": "Pioneer Coffee Roasters onboarding sync",
+    "transcript_text": "Hey, good morning everyone. Can you hear me okay? Great, looks like we're all here. Hi Dani, thanks for joining. So let's get started. Dani Kim from Pioneer Coffee Roasters confirmed the menu list was sent over yesterday afternoon. She walked me through each of the eighteen items and the modifier groups. We agreed on a go-live target of 5/15. Dani mentioned that the hardware shipment is all on track and arrived at the roastery on Wednesday. She has the iPad and the receipt printer set up at the counter already. We did a quick run-through of the training session structure and she's comfortable with the two-week timeline. There was a brief discussion about whether to include the pour-over bar as a separate department or keep it under the espresso menu. We agreed to keep it under espresso for launch and revisit after thirty days. Dani also asked about the loyalty program integration. I told her we can enable that post-launch once we've validated the menu in production. She said that works for her. No outstanding blockers from her side. Action items: I need to send the training schedule by end of week, Dani will finalize the pricing on the seasonal drinks list by Monday, and we'll do a soft-launch dry run on 5/13. Sounds good, thanks everyone, talk soon."
+  },
+  {
+    "id": "msg_002",
+    "subject": "Zoom meeting recap: Maple Grove check-in",
+    "received_at": "2026-05-02T18:30:00Z",
+    "sender": {"email": "noreply@zoom.us", "name": "Zoom Recordings"},
+    "meeting_topic": "Maple Grove Pet Supply check-in",
+    "transcript_text": "Emma Thornton at Maple Grove Pet Supply needs a second register sooner than expected due to weekend foot traffic. Asked us to expedite. Looping in ops."
+  },
+  {
+    "id": "msg_003",
+    "subject": "Zoom meeting recap: Westside Hardware install plan",
+    "received_at": "2026-05-02T20:15:00Z",
+    "sender": {"email": "noreply@zoom.us", "name": "Zoom Recordings"},
+    "meeting_topic": "Westside Hardware install plan",
+    "transcript_text": "Sarah Reilly walked through the install plan for Westside Hardware. Tom Reilly is offsite this week so his signoff on the revised payment terms is still pending. Sarah will follow up with Tom on Monday and circle back."
+  }
+]

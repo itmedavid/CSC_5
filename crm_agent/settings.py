@@ -73,3 +73,18 @@ RINGCENTRAL_SERVER_URL = os.environ.get(
     "RINGCENTRAL_SERVER_URL", "https://platform.ringcentral.com"
 )
 RINGCENTRAL_JWT = os.environ.get("RINGCENTRAL_JWT", "")
+
+# Outlook / Microsoft Graph integration (M3). "mock" reads the fixture;
+# "live" requires Azure AD app credentials and the `msal` library.
+OUTLOOK_MODE = os.environ.get("OUTLOOK_MODE", "mock").strip().lower()
+OUTLOOK_FIXTURE_PATH = PACKAGE_ROOT / os.environ.get(
+    "OUTLOOK_FIXTURE_PATH", "tests/fixtures/sample_recaps.json"
+)
+OUTLOOK_TENANT_ID = os.environ.get("OUTLOOK_TENANT_ID", "")
+OUTLOOK_CLIENT_ID = os.environ.get("OUTLOOK_CLIENT_ID", "")
+OUTLOOK_CLIENT_SECRET = os.environ.get("OUTLOOK_CLIENT_SECRET", "")
+
+# Recap summarizer (M3). Transcripts above this character count are routed
+# through the summarizer LLM before reaching the note formatter.
+RECAP_SUMMARIZE_CHAR_THRESHOLD = _int("RECAP_SUMMARIZE_CHAR_THRESHOLD", 1500)
+RECAP_MAX_TOKENS = _int("RECAP_MAX_TOKENS", 600)
